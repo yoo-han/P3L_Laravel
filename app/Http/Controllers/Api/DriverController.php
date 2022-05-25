@@ -44,6 +44,23 @@ class DriverController extends Controller
         ], 404);
     }
 
+    public function showAvailableDriver()
+    {
+        $driver = Driver::where('status_driver','Available')->get();
+
+        if(!is_null($driver)) {
+            return response([
+                'message' => 'Retrieve Driver Success',
+                'data' => $driver
+            ], 200); 
+        }
+
+        return response([
+            'message' => 'Driver Not Found',
+            'data' => null
+        ], 404);
+    }
+
     public function store(Request $request)
     {
         $get_data = Driver::orderBy('id_driver','DESC')->first();

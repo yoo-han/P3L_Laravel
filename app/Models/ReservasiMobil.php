@@ -34,6 +34,26 @@ class ReservasiMobil extends Model
         'status_reservasi',
     ];
 
+    public function getMobil(){
+        return $this->belongsTo(Mobil::class,'id_mobil','id_mobil');
+    }
+
+    public function getDriver(){
+        return $this->belongsTo(Driver::class,'id_driver','id_driver');
+    }
+
+    public function getPegawai(){
+        return $this->belongsTo(Pegawai::class,'id_pegawai','id_pegawai');
+    }
+
+    public function getCustomer(){
+        return $this->belongsTo(Customer::class,'id_customer','id_customer');
+    }
+
+    public function getPromo(){
+        return $this->belongsTo(Promo::class,'id_promo','id_promo');
+    }
+
     public function getCreatedAtAttribute()
     {
         if (!is_null($this->attributes['created_at'])){

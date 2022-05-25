@@ -52,9 +52,25 @@ class DetailShiftController extends Controller
             'id_shift' => 'required',
             'hari' => 'required|string',
         ]); 
-        
+
         if($validate->fails())
             return response(['message' => $validate->errors()], 400); 
+
+        $countShift = DetailShift::select('id_pegawai')->where('id_pegawai', $request->id_pegawai)->count();
+
+        if($countShift == 6){
+            return response([
+                'message' => 'Shift untuk pegawai telah mencapai maksimal 6 shift/minggu',
+            ], 400);
+        }
+
+        $cekHari = DetailShift::select('id_pegawai')->addSelect('id_shift')->addSelect('hari')->where('id_pegawai', $request->id_pegawai)->where('id_shift', $request->id_shift)->where('hari', $request->hari)->first();
+
+        if($cekHari){
+            return response([
+                'message' => 'Pegawai telah memiliki shift pada hari ini',
+            ], 400);
+        }
 
         $jadwal=DetailShift::create($storeData);
         return response([
@@ -105,6 +121,14 @@ class DetailShiftController extends Controller
 
         if($validate->fails())
             return response(['message' => $validate->errors()], 400);
+
+        $cekHari = DetailShift::select('id_pegawai')->addSelect('id_shift')->addSelect('hari')->where('id_pegawai', $request->id_pegawai)->where('id_shift', $request->id_shift)->where('hari', $request->hari)->first();
+
+        if($cekHari){
+            return response([
+                'message' => 'Pegawai telah memiliki shift pada hari ini',
+            ], 400);
+        }
 
         $jadwal->id_shift=$updateData['id_shift'];
         $jadwal->hari=$updateData['hari'];

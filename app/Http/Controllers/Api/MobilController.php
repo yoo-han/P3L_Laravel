@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Validator;
 use App\Models\Mobil;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class MobilController extends Controller
 {
@@ -47,6 +49,27 @@ class MobilController extends Controller
     public function showTersedia()
     {
         $car = Mobil::with('getMitra')->where('status_mobil','Tersedia')->get();
+
+        if(!is_null($car)) {
+            return response([
+                'message' => 'Retrieve Car Success',
+                'data' => $car
+            ], 200); 
+        }
+
+        return response([
+            'message' => 'Car Not Found',
+            'data' => null
+        ], 404);
+    }
+
+    public function showContractLimit()
+    {
+        $car = DB::table('mobils')
+        ->join('mitra_mobils','mobils.id_mitra','=','mitra_mobils.id_mitra')
+        ->select('mobils.id_mitra','mitra_mobils.id_mitra','mobils.*','mitra_mobils.periode_kontrak_akhir')
+        ->whereRaw("DATEDIFF(mitra_mobils.periode_kontrak_akhir,'".Carbon::now()."')  < 30")
+        ->get();
 
         if(!is_null($car)) {
             return response([

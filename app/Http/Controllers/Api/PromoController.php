@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Validator;
 use App\Models\Promo;
+use App\Models\Customer;
+use Carbon\Carbon;
+use DateTime;
 
 class PromoController extends Controller
 {
@@ -42,6 +45,46 @@ class PromoController extends Controller
             'message' => 'Promo Not Found',
             'data' => null
         ], 404);
+    }
+
+    public function showByIdCustomer(Request $request)
+    {
+        $customer = Customer::where('id_customer', $request->id_customer)->first();
+        $getTanggalLahir = new DateTime($customer->tanggal_lahir_customer);
+        $interval = Carbon::now()->diff($getTanggalLahir);
+
+        $date = Carbon::now();
+
+        $kodepromo = array();
+
+        if($interval->y >= 17 && $interval->y <= 22 && $customer->ktp_customer != null){
+            $kodepromo[] = 'MHS';
+        }
+
+        if(Promo::where('kode_promo', 'MDK')->where('status', 'active')){
+            $kodepromo[] = 'MDK';
+        }
+
+        if($interval->d == 0 && $date->format('m') == Carbon::parse($getTanggalLahir)->format('m')){
+            $kodepromo[] = 'BDAY';
+        }
+
+        if($date->format('l') == 'Saturday' || $date->format('l') == 'Sunday'){
+            $kodepromo[] = 'WKN';
+        }
+
+       $promo = Promo::where('status_promo', 'Aktif')->whereIn('kode_promo',$kodepromo)->get();
+        if(!is_null($customer)){
+            return response([
+                'message' => 'Retrieve Promo Success',
+                'data' => $promo
+            ], 200);
+        }
+
+        return response([
+            'message' => 'Promo Not Found',
+            'data' => null
+        ], 400);
     }
 
     public function store(Request $request)

@@ -28,6 +28,23 @@ class PegawaiController extends Controller
         ],400);
     }
 
+    public function showWithoutManager()
+    {
+        $pegawai = Pegawai::where('jabatan_pegawai','!=','Manager')->get();
+
+        if (count($pegawai) > 0) {
+            return response([
+                'message' => 'Retrieve All Success',
+                'data' => $pegawai
+            ], 200);
+        }
+
+        return response([
+            'message' => 'Empty',
+            'data' => null
+        ],400);
+    }
+
     public function show($id)
     {
         $pegawai = Pegawai::where('id_pegawai',$id)->first();
