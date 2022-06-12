@@ -179,6 +179,53 @@ class PegawaiController extends Controller
         ], 400);
     }
 
+    public function updateProfile(Request $request, $id)
+    {
+        $pegawai = Pegawai::where('id_pegawai',$id)->first();
+        if(is_null($pegawai)) {
+            return response([
+                'message' => 'Employee Not Found',
+                'data' => null
+            ], 404);
+        }
+
+        $updateData=$request->all();
+        $validate=Validator::make($updateData, [
+            'nama_pegawai' => 'required|string',
+            'alamat_pegawai' => 'required|string',
+            'tanggal_lahir_pegawai' => 'required',
+            'jenis_kelamin_pegawai' => 'required',
+            'email_pegawai' => ['required', Rule::unique('customers','email_customer'), Rule::unique('pegawais','email_pegawai')->ignore($pegawai), Rule::unique('drivers','email_driver')],
+            'no_telp_pegawai' => 'required|string',
+            'jabatan_pegawai' => 'nullable|string',
+        ]);
+
+
+        if($validate->fails())
+            return response(['message' => $validate->errors()], 400);
+
+        $pegawai->nama_pegawai=$updateData['nama_pegawai'];
+        $pegawai->alamat_pegawai=$updateData['alamat_pegawai'];
+        $pegawai->tanggal_lahir_pegawai=$updateData['tanggal_lahir_pegawai'];
+        $pegawai->jenis_kelamin_pegawai=$updateData['jenis_kelamin_pegawai'];
+        $pegawai->email_pegawai=$updateData['email_pegawai'];
+        $pegawai->no_telp_pegawai=$updateData['no_telp_pegawai'];
+        if($request->jabatan_pegawai != null)
+            $pegawai->jabatan_pegawai=$updateData['jabatan_pegawai'];
+
+        if($pegawai->save()) {
+            return response([
+                'message' => 'Update Employee Success',
+                'data' => $pegawai
+            ], 200);
+        }
+
+        return response([
+            'message' => 'Update Employee Failed',
+            'data' => null,
+        ], 400);
+    }
+
     
     public function updatePassword(Request $request, $id)
     {

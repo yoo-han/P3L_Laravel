@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('no_telp_customer',13);
             $table->string('ktp_customer');
             $table->string('status_customer',15)->default('Unverified');
+            $table->integer('rating_ajr')->nullable();
             $table->timestamps();
         });
     }

@@ -166,9 +166,8 @@ class DriverController extends Controller
             'tanggal_lahir_driver' => 'required',
             'jenis_kelamin_driver' => 'required',
             'email_driver' => ['required', Rule::unique('customers','email_customer'), Rule::unique('pegawais','email_pegawai'), Rule::unique('drivers','email_driver')->ignore($driver)],
-            // 'password_driver' => 'required|string',
             'no_telp_driver' => 'required|string',
-            'bahasa'  => 'required',
+            'bahasa'  => 'nullable',
             'foto_driver' => 'nullable|image|mimes:jpeg,jpg,png',
             'sim_driver' => 'nullable|image|mimes:jpeg,jpg,png',
             'surat_bebas_napza' => 'nullable|image|mimes:jpeg,jpg,png',
@@ -201,8 +200,8 @@ class DriverController extends Controller
         $driver->tanggal_lahir_driver=$updateData['tanggal_lahir_driver'];
         $driver->jenis_kelamin_driver=$updateData['jenis_kelamin_driver'];
         $driver->email_driver=$updateData['email_driver'];
-        // $driver->password_driver=$updateData['password_driver'];
         $driver->no_telp_driver=$updateData['no_telp_driver'];
+        if($request->bahasa != null)
         $driver->bahasa=$updateData['bahasa'];
         if($request->foto_driver != null)
         $driver->foto_driver = $fotoDriver;
@@ -221,6 +220,51 @@ class DriverController extends Controller
         $driver->rerata_rating=$updateData['rerata_rating'];
         if($request->banyak_rating != null)
         $driver->banyak_rating=$updateData['banyak_rating'];
+
+        if($driver->save()) {
+            return response([
+                'message' => 'Update Driver Success',
+                'data' => $driver
+            ], 200);
+        }
+
+        return response([
+            'message' => 'Update Driver Failed',
+            'data' => null,
+        ], 400);
+    }
+
+    public function updateProfile(Request $request, $id)
+    {
+        $driver=Driver::where('id_driver',$id)->first();
+        if(is_null($driver)) {
+            return response([
+                'message' => 'Driver Not Found',
+                'data' => null
+            ], 404);
+        }
+
+        $updateData=$request->all();
+        $validate=Validator::make($updateData, [
+            'nama_driver' => 'required|string',
+            'alamat_driver' => 'required|string',
+            'tanggal_lahir_driver' => 'required',
+            'jenis_kelamin_driver' => 'required',
+            'email_driver' => ['required', Rule::unique('customers','email_customer'), Rule::unique('pegawais','email_pegawai'), Rule::unique('drivers','email_driver')->ignore($driver)],
+            'no_telp_driver' => 'required|string',
+            'status_driver' => 'required|string',
+        ]);
+
+        if($validate->fails())
+            return response(['message' => $validate->errors()], 400);
+
+        $driver->nama_driver=$updateData['nama_driver'];
+        $driver->alamat_driver=$updateData['alamat_driver'];
+        $driver->tanggal_lahir_driver=$updateData['tanggal_lahir_driver'];
+        $driver->jenis_kelamin_driver=$updateData['jenis_kelamin_driver'];
+        $driver->email_driver=$updateData['email_driver'];
+        $driver->no_telp_driver=$updateData['no_telp_driver'];
+        $driver->status_driver=$updateData['status_driver'];
 
         if($driver->save()) {
             return response([

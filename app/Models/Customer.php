@@ -25,6 +25,7 @@ class Customer extends Authenticatable
         'password_customer',
         'no_telp_customer',
         'ktp_customer',
+        'rating_ajr',
     ];
 
     public function getCreatedAtAttribute()

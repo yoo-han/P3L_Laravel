@@ -208,4 +208,37 @@ class CustomerController extends Controller
             'data' => null,
         ], 400);
     }
+
+    public function updateRating(Request $request, $id)
+    {
+        $customer=Customer::where('id_customer',$id)->first();
+        if(is_null($customer)) {
+            return response([
+                'message' => 'Customer Not Found',
+                'data' => null
+            ], 404);
+        }
+
+        $updateData=$request->all();
+        $validate=Validator::make($updateData, [
+            'rating_ajr' => 'required'
+        ]);
+
+        if($validate->fails())
+            return response(['message' => $validate->errors()], 400);
+
+        $customer->rating_ajr=$updateData['rating_ajr'];
+
+        if($customer->save()) {
+            return response([
+                'message' => 'Update Customer Success',
+                'data' => $customer
+            ], 200);
+        }
+
+        return response([
+            'message' => 'Update Customer Failed',
+            'data' => null,
+        ], 400);
+    }
 }

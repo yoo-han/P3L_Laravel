@@ -65,6 +65,23 @@ class ReservasiMobilController extends Controller
         ], 404);
     }
 
+    public function showDriver($id_driver)
+    {
+        $reservation = ReservasiMobil::with('getMobil','getDriver','getPegawai','getPromo','getCustomer')->where('id_driver',$id_driver)->get();
+
+        if(!is_null($reservation)) {
+            return response([
+                'message' => 'Retrieve Reservation Success',
+                'data' => $reservation
+            ], 200); 
+        }
+
+        return response([
+            'message' => 'Reservation Not Found',
+            'data' => null
+        ], 404);
+    }
+
     public function store(Request $request)
     {
         $storeData=$request->all();
@@ -124,6 +141,7 @@ class ReservasiMobilController extends Controller
 
         $car = Mobil::where('id_mobil', $request->id_mobil)->first();
         $car->status_mobil='Sedang Dipinjam';
+        $car->total_peminjaman += 1; 
         $car->save();
 
         return response([
@@ -236,14 +254,18 @@ class ReservasiMobilController extends Controller
         }
         if($request->status_reservasi != null){
             $reservation->status_reservasi=$updateData['status_reservasi'];
+            
             if($updateData['status_reservasi'] == 'Belum Bayar Belum Verifikasi'){
-                $driver = Driver::where('id_driver', $reservation->id_driver)->first();
-                $driver->status_driver='Available';
-                $driver->save();
+                if($reservation->jenis_reservasi == 'Penyewaan Mobil dan Driver'){
+                    $driver = Driver::where('id_driver', $reservation->id_driver)->first();
+                    $driver->status_driver='Available';
+                    $driver->save();
+                }
                 $car = Mobil::where('id_mobil', $reservation->id_mobil)->first();
-                $car->status_mobil='Tersedia';
-                $car->save();
-            }
+                    $car->status_mobil='Tersedia';
+                    $car->save();
+            } 
+            
         }
 
         if($reservation->save()) {
